@@ -215,16 +215,6 @@ object hof{
       case Option.Some(v) => f(v)
       case Option.None => Option.None
     }
-  }
-
-  object Option{
-
-    case class Some[T](v: T) extends Option[T]
-    case object None extends Option[Nothing]
-  }
-
-
-
 
 
   /**
@@ -232,11 +222,29 @@ object hof{
    * Реализовать метод printIfAny, который будет печатать значение, если оно есть
    */
 
+    def printIfAny(): Unit = this match {
+      case Option.Some(v) => println(v)
+      case Option.None => ()
+    }
 
   /**
    *
    * Реализовать метод zip, который будет создавать Option от пары значений из 2-х Option
    */
+
+    def zip[A](another: Option[A]): Option[(T, A)] = (this, another) match {
+      case (Option.Some(value1), Option.Some(value2)) => Option.Some((value1, value2))
+      case _ => Option.None
+    }
+
+    def zip2[A](another: Option[A]): Option[(T, A)] = this.flatMap(value1 =>
+      another.map(value2 => (value1, value2))
+    )
+
+    def zip3[A](another: Option[A]): Option[(T, A)] = for {
+      value1 <- this
+      value2 <- another
+    } yield (value1, value2)
 
 
   /**
@@ -245,7 +253,22 @@ object hof{
    * в случае если исходный не пуст и предикат от значения = true
    */
 
- }
+    def filter(predicate: T => Boolean): Option[T] = this match {
+      case some@Option.Some(v) if predicate(v) => some
+      case _ => Option.None
+    }
+
+  }
+
+  object Option {
+
+    def apply[T](v: T): Option[T] = if (v == null) None else Some(v)
+
+    case class Some[T](v: T) extends Option[T]
+
+    case object None extends Option[Nothing]
+  }
+}
 
  object list {
    /**
